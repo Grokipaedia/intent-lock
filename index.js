@@ -1,26 +1,39 @@
-// 🔒 intent-lock (MVP)
+import OpenAI from "openai";
 
-// fake AI response (we keep it simple first)
-function getAIResponse(prompt) {
-  return "This domain could be worth millions due to brand potential";
-}
+// 🔑 uses your API key from environment
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
-// simple constraints
-const constraints = [
-  "no hype",
-  "no brand speculation"
-];
-
-// check for violations
+// constraints
 function violates(output) {
   if (output.toLowerCase().includes("millions")) return true;
   if (output.toLowerCase().includes("brand")) return true;
   return false;
 }
 
-// run with "intent lock"
-function run(prompt) {
-  const output = getAIResponse(prompt);
+// real AI call
+async function getAIResponse(prompt) {
+  const res = await client.chat.completions.create({
+    model: "gpt-4.1-mini",
+    messages: [
+      {
+        role: "system",
+        content: "Be realistic. No hype. No speculation."
+      },
+      {
+        role: "user",
+        content: prompt
+      }
+    ]
+  });
+
+  return res.choices[0].message.content;
+}
+
+// intent lock
+async function run(prompt) {
+  const output = await getAIResponse(prompt);
 
   if (violates(output)) {
     return "❌ BLOCKED: violates constraints";
@@ -30,4 +43,4 @@ function run(prompt) {
 }
 
 // test
-console.log(run("Should I buy AGIHQS.com?"));
+run("Should I buy AGIHQS.com?").then(console.log);
