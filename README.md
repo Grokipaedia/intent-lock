@@ -21,3 +21,8 @@ AI follows prompts.
 But it doesn’t respect boundaries.
 
 intent-lock enforces them.
+## Now with real AI
+
+Uses OpenAI but still enforces constraints AFTER generation.
+
+Not prompt control — output control.
